@@ -1,0 +1,33 @@
+spring:
+  main:
+    allow-circular-references: true
+  data:
+    redis:
+      url: redis://localhost:6370
+  profiles:
+    active: test
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2
+
+server:
+  port: 8080
+
+demo:
+  datasource:
+    mysql:
+      password: 123
+      port: 3306
+      timeout: 100
+      username: 123
+      host: localhost
+
+common:
+  cookie-name: UT-TACO-TOKEN
+
+auth:
+  email:
+    enable: true

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <contextName>lowcoder-logback</contextName>
+    <property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %level %class{50}#%M:%L %X{userId} %X{httpMethod} %X{path} [%thread]: %msg %n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
