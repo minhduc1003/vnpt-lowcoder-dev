@@ -158,7 +158,15 @@ const FooterInnerGrid = styled(InnerGrid)<{
     props.$footerBackgroundImageOrigin &&
     `background-origin: ${props.$footerBackgroundImageOrigin};`}
 `;
-
+const SiderStyle = styled(Sider)`
+  padding: 1px;
+  .ant-layout-sider-zero-width-trigger {
+    top: -50px !important;
+    z-index: 1000;
+    background-color: #fff !important;
+    color: black !important;
+  }
+`;
 export type LayoutProps = LayoutViewProps & {
   hintPlaceholder?: ReactNode;
   animationStyle: AnimationStyleType;
@@ -329,10 +337,11 @@ export function PageLayout(
                       <BackgroundColorContext.Provider
                         value={siderStyle?.siderBackground}
                       >
-                        <Sider
+                        {/* slider */}
+                        <SiderStyle
                           width={container.siderWidth}
                           style={{
-                            padding: "0px",
+                            // padding: "0px",
                             margin: "0px",
                             marginTop: style.borderWidth,
                             backgroundColor:
@@ -384,7 +393,7 @@ export function PageLayout(
                               }}
                             />
                           </ScrollBar>
-                        </Sider>
+                        </SiderStyle>
                       </BackgroundColorContext.Provider>
                     )}
                     <Content
@@ -441,62 +450,64 @@ export function PageLayout(
                       <BackgroundColorContext.Provider
                         value={siderStyle?.siderBackground}
                       >
-                        {/* <Sider
-                          width={container.siderWidth}
-                          style={{
-                            padding: "0px",
-                            margin: "0px",
-                            backgroundColor:
-                              siderStyle?.siderBackground || "transparent",
-                          }}
-                          collapsible={container.siderCollapsible}
-                          breakpoint="sm"
-                          collapsedWidth={container.siderCollapsedWidth}
-                          reverseArrow={true}
-                          collapsed={siderCollapsed}
-                          onCollapse={(value) => setSiderCollapsed(value)}
-                        >
-                          <ScrollBar
+                        {
+                          <Sider
+                            width={container.siderWidth}
                             style={{
-                              height: container.autoHeight ? "auto" : "100%",
-                              margin: "0px",
                               padding: "0px",
+                              margin: "0px",
+                              backgroundColor:
+                                siderStyle?.siderBackground || "transparent",
                             }}
-                            hideScrollbar={!container.siderScrollbars}
+                            collapsible={container.siderCollapsible}
+                            breakpoint="sm"
+                            collapsedWidth={container.siderCollapsedWidth}
+                            reverseArrow={true}
+                            collapsed={siderCollapsed}
+                            onCollapse={(value) => setSiderCollapsed(value)}
                           >
-                            <SiderInnerGrid
-                              {...otherSiderProps}
-                              items={gridItemCompToGridItems(siderItems)}
-                              horizontalGridCells={horizontalGridCells}
-                              autoHeight={true}
-                              emptyRows={30}
-                              minHeight={`calc(100vh - ${style.padding}px)`}
-                              containerPadding={[0, 0]}
-                              showName={{ bottom: showFooter ? 20 : 0 }}
-                              $backgroundColor={
-                                siderStyle?.siderBackground || "transparent"
-                              }
-                              $siderBackgroundImage={
-                                siderStyle?.siderBackgroundImage
-                              }
-                              $siderBackgroundImageRepeat={
-                                siderStyle?.siderBackgroundImageRepeat
-                              }
-                              $siderBackgroundImageSize={
-                                siderStyle?.siderBackgroundImageSize
-                              }
-                              $siderBackgroundImagePosition={
-                                siderStyle?.siderBackgroundImagePosition
-                              }
-                              $siderBackgroundImageOrigin={
-                                siderStyle?.siderBackgroundImageOrigin
-                              }
+                            <ScrollBar
                               style={{
-                                padding: siderStyle.containerSiderPadding,
+                                height: container.autoHeight ? "auto" : "100%",
+                                margin: "0px",
+                                padding: "0px",
                               }}
-                            />
-                          </ScrollBar>
-                        </Sider> */}
+                              hideScrollbar={!container.siderScrollbars}
+                            >
+                              <SiderInnerGrid
+                                {...otherSiderProps}
+                                items={gridItemCompToGridItems(siderItems)}
+                                horizontalGridCells={horizontalGridCells}
+                                autoHeight={true}
+                                emptyRows={30}
+                                minHeight={`calc(100vh - ${style.padding}px)`}
+                                containerPadding={[0, 0]}
+                                showName={{ bottom: showFooter ? 20 : 0 }}
+                                $backgroundColor={
+                                  siderStyle?.siderBackground || "transparent"
+                                }
+                                $siderBackgroundImage={
+                                  siderStyle?.siderBackgroundImage
+                                }
+                                $siderBackgroundImageRepeat={
+                                  siderStyle?.siderBackgroundImageRepeat
+                                }
+                                $siderBackgroundImageSize={
+                                  siderStyle?.siderBackgroundImageSize
+                                }
+                                $siderBackgroundImagePosition={
+                                  siderStyle?.siderBackgroundImagePosition
+                                }
+                                $siderBackgroundImageOrigin={
+                                  siderStyle?.siderBackgroundImageOrigin
+                                }
+                                style={{
+                                  padding: siderStyle.containerSiderPadding,
+                                }}
+                              />
+                            </ScrollBar>
+                          </Sider>
+                        }
                       </BackgroundColorContext.Provider>
                     )}
                   </Layout>

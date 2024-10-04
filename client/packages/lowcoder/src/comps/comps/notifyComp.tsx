@@ -11,8 +11,19 @@ import { trans } from "i18n";
 
 import { useEffect, useRef, useState } from "react";
 import { withIsLoadingMethod } from "@lowcoder-ee/index.sdk";
+import { relative } from "path";
 const Wrapper = styled.div`
   border-radius: 4px;
+  @media only screen and (max-width: 360px) {
+    width: 15px;
+    height: 15px;
+  }
+  @media only screen and (min-width: 360px) and (max-width: 768px) {
+    width: 20px;
+    height: 20px;
+  }
+  width: 30px;
+  height: 30px;
 `;
 const Count = styled.div<{
   $countStyle?: any;
@@ -36,13 +47,49 @@ const Dropdown = styled.div<{
   $itemStyle?: any;
   $width?: string;
 }>`
+  @media only screen and (max-width: 360px) {
+    width: 100px;
+    .dropdown-head {
+      padding: 2.5px 5px !important;
+      font-size: 14px !important;
+    }
+    .dropdown-content-item {
+      padding: 2.5px 5px !important;
+    }
+    .dropdown-content-item > .dropdown-content__icon {
+      display: none;
+    }
+    .dropdown-content-item > .dropdown-content__content > p {
+      font-size: 10px;
+    }
+  }
+  @media only screen and (min-width: 360px) and (max-width: 768px) {
+    width: 220px;
+    .dropdown-head {
+      padding: 5px 10px !important;
+      font-size: 16px !important;
+    }
+    .dropdown-content-item {
+      padding: 5px 10px !important;
+    }
+    .dropdown-content-item > .dropdown-content__icon {
+      display: none;
+    }
+    .dropdown-content-item > .dropdown-content__content > p {
+      font-size: 11px;
+    }
+  }
+  @media only screen and (min-width: 768px) and (max-width: 1024px) {
+    width: 300px;
+  }
   display: ${(props) => (props.$isOpen ? "block" : "none")};
-  width: ${(props) => props.$width};
   position: absolute;
+  width: 350px;
   right: 0;
   background-color: ${(props) => props.$itemStyle.backgroundColor || "#fff"};
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 10px;
+  z-index: 1000;
   .dropdown-head {
     padding: 10px 20px;
     font-size: 20px;
@@ -92,7 +139,6 @@ const StyleControl = [
   },
 ] as const;
 const childrenMap = {
-  logoUrl: StringControl,
   data: withIsLoadingMethod(JSONObjectArrayControl),
   countStyle: styleControl(StyleControl, "countStyle"),
   notiItemStyle: styleControl(StyleControl, "notiItemStyle"),
@@ -120,25 +166,27 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
   useOutsideAlerter(wrapperRef);
   return (
     <Wrapper onClick={() => setActive(!active)} ref={wrapperRef}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="icon-notify"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-        />
-      </svg>
-      {props.data.length > 0 && (
-        <Count $countStyle={props.countStyle}>
-          <span>{props.data.length}</span>
-        </Count>
-      )}
+      <div style={{ position: "relative" }}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="icon-notify"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
+          />
+        </svg>
+        {props.data.length > 0 && (
+          <Count $countStyle={props.countStyle}>
+            <span>{props.data.length}</span>
+          </Count>
+        )}
+      </div>
       <Dropdown
         $isOpen={active}
         $hoverStyle={props.notiItemHoverStyle}
@@ -177,12 +225,6 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
   .setPropertyViewFn((children) => {
     return (
       <>
-        <Section name={sectionNames.advanced}>
-          {children.logoUrl.propertyView({
-            label: trans("navigation.logoURL"),
-            tooltip: trans("navigation.logoURLDesc"),
-          })}
-        </Section>
         <Section name={"Data"}>
           {children.data.propertyView({
             label: "Data",
@@ -205,5 +247,5 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
   .build();
 
 export const NotifyComp = withExposingConfigs(NotifyCompBase, [
-  new NameConfig("logoUrl", ""),
+  new NameConfig("data", ""),
 ]);

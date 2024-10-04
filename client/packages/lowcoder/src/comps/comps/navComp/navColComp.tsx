@@ -4,7 +4,7 @@ import {
   withExposingConfigs,
 } from "comps/generators/withExposing";
 import { UICompBuilder, withDefault } from "comps/generators";
-import { Section, sectionNames } from "lowcoder-design";
+import { controlItem, Section, sectionNames } from "lowcoder-design";
 import styled from "styled-components";
 import {
   clickEvent,
@@ -23,6 +23,13 @@ import {
   AnimationStyle,
   AnimationStyleType,
   NavigationStyle,
+  NavLayoutItemActiveStyle,
+  NavLayoutItemActiveStyleType,
+  NavLayoutItemHoverStyle,
+  NavLayoutItemHoverStyleType,
+  NavLayoutItemStyle,
+  NavLayoutItemStyleType,
+  NavLayoutStyle,
 } from "comps/controls/styleControlConstants";
 import { hiddenPropertyView } from "comps/utils/propertyUtils";
 import { trans } from "i18n";
@@ -40,18 +47,88 @@ import {
 } from "../layout/layoutMenuItemComp";
 import { genRandomKey } from "@lowcoder-ee/index.sdk";
 import Item from "antd/es/list/Item";
-
+import Segmented from "@lowcoder-ee/components/Segmented";
+import { menuItemStyleOptions } from "../layout/navLayoutConstants";
+type MenuItemStyleOptionValue = "normal" | "hover" | "active";
 type NavColComp = Required<MenuProps>["items"][number];
 const childrenMap = {
-  logoUrl: StringControl,
   items: withDefault(navListComp(), [
     {
       label: trans("menuItem") + " 1",
       itemKey: genRandomKey(),
     },
   ]),
+  navStyle: styleControl(NavLayoutStyle, "navStyle"),
+    navItemStyle: styleControl(NavLayoutItemStyle, "navItemStyle"),
+    navItemHoverStyle: styleControl(
+      NavLayoutItemHoverStyle,
+      "navItemHoverStyle"
+    ),
+    navItemActiveStyle: styleControl(
+      NavLayoutItemActiveStyle,
+      "navItemActiveStyle"
+    ),
 };
+const StyledMenu = styled(Menu)<{
+  $navItemStyle?: NavLayoutItemStyleType;
+  $navItemHoverStyle?: NavLayoutItemHoverStyleType;
+  $navItemActiveStyle?: NavLayoutItemActiveStyleType;
+}>`
+@media only screen and (max-width: 768px) {
+  .ant-menu-title-content{
+    display: none;
+  } 
+}
+   .ant-menu-item {
+    background-color: ${(props) => props.$navItemStyle?.background};
+    color: ${(props) => props.$navItemStyle?.text};
+    border-radius: ${(props) => props.$navItemStyle?.radius} !important;
+    border: ${(props) => `1px solid ${props.$navItemStyle?.border}`};
+  }
+  .ant-menu-item-active {
+    background-color: ${(props) =>
+    props.$navItemHoverStyle?.background} !important;
+    color: ${(props) => props.$navItemHoverStyle?.text} !important;
+    border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
+  } 
+  .ant-menu-item-selected {
+    background-color: ${(props) =>
+    props.$navItemActiveStyle?.background} !important;
+    color: ${(props) => props.$navItemActiveStyle?.text} !important;
+    border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
+  }
 
+  .ant-menu-submenu {
+    
+
+    .ant-menu-submenu-title {
+      background-color: ${(props) => props.$navItemStyle?.background};
+      color: ${(props) => props.$navItemStyle?.text};
+      border-radius: ${(props) => props.$navItemStyle?.radius} !important;
+      border: ${(props) => `1px solid ${props.$navItemStyle?.border}`};
+    }
+
+
+
+    &.ant-menu-submenu-active {
+      > .ant-menu-submenu-title {
+        background-color: ${(props) =>
+    props.$navItemHoverStyle?.background} !important;
+        color: ${(props) => props.$navItemHoverStyle?.text} !important;
+        border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
+      }
+    }
+    &.ant-menu-submenu-selected {
+      > .ant-menu-submenu-title {
+        width: 100%;
+        background-color: ${(props) =>
+    props.$navItemActiveStyle?.background} !important;
+        color: ${(props) => props.$navItemActiveStyle?.text} !important;
+        border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
+      }
+    }
+  } 
+`;
 const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
   const data = props.items;
   const [selectedKey, setSelectedKey] = useState();
@@ -81,10 +158,13 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
           setSelectedKey(e.key);
         };
         const item = (
-          <Menu
+          <StyledMenu
             mode="inline"
             onClick={handleClick}
             selectedKeys={[selectedKey as any]}
+            $navItemActiveStyle={props.navItemActiveStyle}
+            $navItemHoverStyle={props.navItemHoverStyle}
+            $navItemStyle={props.navItemStyle}
           >
             {visibleSubItems.length == 0 && (
               <Menu.Item key={idx} onClick={() => onEvent("click")}>
@@ -107,7 +187,7 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
                 ))}
               </Menu.SubMenu>
             )}
-          </Menu>
+          </StyledMenu>
         );
         return item;
       })}
@@ -117,20 +197,36 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
   return <>{items}</>;
 })
   .setPropertyViewFn((children) => {
+    const [styleSegment, setStyleSegment] = useState("normal");
+    
     return (
       <>
-        <Section name={sectionNames.advanced}>
-          {children.logoUrl.propertyView({
-            label: trans("navigation.logoURL"),
-            tooltip: trans("navigation.logoURLDesc"),
-          })}
-        </Section>
         <Section name={"Menu"}>{menuPropertyView(children?.items)}</Section>
+        <Section name={trans("navLayout.navStyle")}>
+            {children.navStyle.getPropertyView()}
+          </Section>
+          <Section name={trans("navLayout.navItemStyle")}>
+            {controlItem(
+              {},
+              <Segmented
+                block
+                options={menuItemStyleOptions}
+                value={styleSegment}
+                onChange={(k) => setStyleSegment(k as MenuItemStyleOptionValue)}
+              />
+            )}
+            {styleSegment === "normal" &&
+              children.navItemStyle.getPropertyView()}
+            {styleSegment === "hover" &&
+              children.navItemHoverStyle.getPropertyView()}
+            {styleSegment === "active" &&
+              children.navItemActiveStyle.getPropertyView()}
+          </Section>
       </>
     );
   })
   .build();
 
 export const NavColComp = withExposingConfigs(NavColCompBase, [
-  new NameConfig("logoUrl", ""),
+  new NameConfig("items", trans("navigation.itemsDesc")),
 ]);
