@@ -648,7 +648,7 @@ export var uiCompMap: Registry = {
     categories: ["layout"],
     keywords: "NavigationColumn",
     lazyLoad: true,
-    compName: "NavComp",
+    compName: "NavColComp",
     compPath: "comps/navComp/navColComp",
     layoutInfo: {
       w: 24,

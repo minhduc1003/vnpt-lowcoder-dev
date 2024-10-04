@@ -441,7 +441,7 @@ export function PageLayout(
                       <BackgroundColorContext.Provider
                         value={siderStyle?.siderBackground}
                       >
-                        <Sider
+                        {/* <Sider
                           width={container.siderWidth}
                           style={{
                             padding: "0px",
@@ -496,7 +496,7 @@ export function PageLayout(
                               }}
                             />
                           </ScrollBar>
-                        </Sider>
+                        </Sider> */}
                       </BackgroundColorContext.Provider>
                     )}
                   </Layout>
@@ -665,6 +665,9 @@ export function PageLayout(
                 `
                 }
                 
+              }
+              .ant-layout-sider-trigger{
+                top: 50px !important;
               }
             `}
           </style>

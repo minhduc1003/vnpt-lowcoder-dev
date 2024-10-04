@@ -3,7 +3,10 @@ import { default as LayoutSider } from "antd/es/layout/Sider";
 import { default as AntdMenu, MenuProps } from "antd/es/menu";
 import { default as Segmented } from "antd/es/segmented";
 import MainContent from "components/layout/MainContent";
-import { LayoutMenuItemComp, LayoutMenuItemListComp } from "comps/comps/layout/layoutMenuItemComp";
+import {
+  LayoutMenuItemComp,
+  LayoutMenuItemListComp,
+} from "comps/comps/layout/layoutMenuItemComp";
 import { menuPropertyView } from "comps/comps/navComp/components/MenuItemList";
 import { registerLayoutMap } from "comps/comps/uiComp";
 import { MultiCompBuilder, withDefault, withViewFn } from "comps/generators";
@@ -17,7 +20,11 @@ import { EditorContainer, EmptyContent } from "pages/common/styledComponent";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { isUserViewMode, useAppPathParam } from "util/hooks";
-import { BoolCodeControl, StringControl, jsonControl } from "comps/controls/codeControl";
+import {
+  BoolCodeControl,
+  StringControl,
+  jsonControl,
+} from "comps/controls/codeControl";
 import { styleControl } from "comps/controls/styleControl";
 import {
   NavLayoutStyle,
@@ -38,9 +45,12 @@ import {
   DataOptionType,
   ModeOptions,
   jsonMenuItems,
-  menuItemStyleOptions
+  menuItemStyleOptions,
 } from "./navLayoutConstants";
-import { clickEvent, eventHandlerControl } from "@lowcoder-ee/comps/controls/eventHandlerControl";
+import {
+  clickEvent,
+  eventHandlerControl,
+} from "@lowcoder-ee/comps/controls/eventHandlerControl";
 import { childrenToProps } from "@lowcoder-ee/comps/generators/multi";
 
 const { Header } = Layout;
@@ -74,9 +84,9 @@ const ContentWrapper = styled.div`
 `;
 
 const StyledMenu = styled(AntdMenu)<{
-  $navItemStyle?: NavLayoutItemStyleType & { width: string},
-  $navItemHoverStyle?: NavLayoutItemHoverStyleType,
-  $navItemActiveStyle?: NavLayoutItemActiveStyleType,
+  $navItemStyle?: NavLayoutItemStyleType & { width: string };
+  $navItemHoverStyle?: NavLayoutItemHoverStyleType;
+  $navItemActiveStyle?: NavLayoutItemActiveStyleType;
 }>`
   .ant-menu-item {
     height: auto;
@@ -87,16 +97,17 @@ const StyledMenu = styled(AntdMenu)<{
     border: ${(props) => `1px solid ${props.$navItemStyle?.border}`};
     margin: ${(props) => props.$navItemStyle?.margin};
     padding: ${(props) => props.$navItemStyle?.padding};
-
   }
   .ant-menu-item-active {
-    background-color: ${(props) => props.$navItemHoverStyle?.background} !important;
+    background-color: ${(props) =>
+      props.$navItemHoverStyle?.background} !important;
     color: ${(props) => props.$navItemHoverStyle?.text} !important;
     border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
   }
 
   .ant-menu-item-selected {
-    background-color: ${(props) => props.$navItemActiveStyle?.background} !important;
+    background-color: ${(props) =>
+      props.$navItemActiveStyle?.background} !important;
     color: ${(props) => props.$navItemActiveStyle?.text} !important;
     border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
   }
@@ -116,7 +127,6 @@ const StyledMenu = styled(AntdMenu)<{
       border: ${(props) => `1px solid ${props.$navItemStyle?.border}`};
       margin: 0;
       padding: ${(props) => props.$navItemStyle?.padding};
-
     }
 
     .ant-menu-item {
@@ -124,23 +134,24 @@ const StyledMenu = styled(AntdMenu)<{
     }
 
     &.ant-menu-submenu-active {
-      >.ant-menu-submenu-title {
+      > .ant-menu-submenu-title {
         width: 100%;
-        background-color: ${(props) => props.$navItemHoverStyle?.background} !important;
+        background-color: ${(props) =>
+          props.$navItemHoverStyle?.background} !important;
         color: ${(props) => props.$navItemHoverStyle?.text} !important;
         border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
       }
     }
     &.ant-menu-submenu-selected {
-      >.ant-menu-submenu-title {
+      > .ant-menu-submenu-title {
         width: 100%;
-        background-color: ${(props) => props.$navItemActiveStyle?.background} !important;
+        background-color: ${(props) =>
+          props.$navItemActiveStyle?.background} !important;
         color: ${(props) => props.$navItemActiveStyle?.text} !important;
         border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
       }
     }
   }
-
 `;
 
 const StyledImage = styled.img`
@@ -149,24 +160,24 @@ const StyledImage = styled.img`
 `;
 
 const defaultStyle = {
-  radius: '0px',
-  margin: '0px',
-  padding: '0px',
-}
+  radius: "0px",
+  margin: "0px",
+  padding: "0px",
+};
 
 type UrlActionType = {
   url?: string;
   newTab?: boolean;
-}
+};
 
 export type MenuItemNode = {
   label: string;
   key: string;
   hidden?: boolean;
   icon?: any;
-  action?: UrlActionType,
+  action?: UrlActionType;
   children?: MenuItemNode[];
-}
+};
 
 function checkDataNodes(value: any, key?: string): MenuItemNode[] | undefined {
   return check(value, ["array", "undefined"], key, (node, k) => {
@@ -199,74 +210,76 @@ let NavTmpLayout = (function () {
     backgroundImage: withDefault(StringControl, ""),
     mode: dropdownControl(ModeOptions, "inline"),
     collapse: BoolCodeControl,
-    navStyle: styleControl(NavLayoutStyle, 'navStyle'),
-    navItemStyle: styleControl(NavLayoutItemStyle, 'navItemStyle'),
-    navItemHoverStyle: styleControl(NavLayoutItemHoverStyle, 'navItemHoverStyle'),
-    navItemActiveStyle: styleControl(NavLayoutItemActiveStyle, 'navItemActiveStyle'),
+    navStyle: styleControl(NavLayoutStyle, "navStyle"),
+    navItemStyle: styleControl(NavLayoutItemStyle, "navItemStyle"),
+    navItemHoverStyle: styleControl(
+      NavLayoutItemHoverStyle,
+      "navItemHoverStyle"
+    ),
+    navItemActiveStyle: styleControl(
+      NavLayoutItemActiveStyle,
+      "navItemActiveStyle"
+    ),
   };
   return new MultiCompBuilder(childrenMap, (props) => {
     return null;
   })
     .setPropertyViewFn((children) => {
-      const [styleSegment, setStyleSegment] = useState('normal')
+      const [styleSegment, setStyleSegment] = useState("normal");
 
       return (
-        <div style={{overflowY: 'auto'}}>
+        <div style={{ overflowY: "auto" }}>
           <Section name={trans("menu")}>
             {children.dataOptionType.propertyView({
               radioButton: true,
               type: "oneline",
             })}
-            {
-              children.dataOptionType.getView() === DataOption.Manual
-                ? menuPropertyView(children.items)
-                : children.jsonItems.propertyView({
+            {children.dataOptionType.getView() === DataOption.Manual
+              ? menuPropertyView(children.items)
+              : children.jsonItems.propertyView({
                   label: "Json Data",
-                })
-            }
+                })}
           </Section>
           <Section name={trans("eventHandler.eventHandlers")}>
-            { children.onEvent.getPropertyView() }
+            {children.onEvent.getPropertyView()}
           </Section>
           <Section name={sectionNames.layout}>
-            { children.width.propertyView({
-                label: trans("navLayout.width"),
-                tooltip: trans("navLayout.widthTooltip"),
-                placeholder: DEFAULT_WIDTH + "",
+            {children.width.propertyView({
+              label: trans("navLayout.width"),
+              tooltip: trans("navLayout.widthTooltip"),
+              placeholder: DEFAULT_WIDTH + "",
             })}
-            { children.mode.propertyView({
+            {children.mode.propertyView({
               label: trans("labelProp.position"),
-              radioButton: true
+              radioButton: true,
             })}
-            { children.collapse.propertyView({
+            {children.collapse.propertyView({
               label: trans("labelProp.collapse"),
             })}
             {children.backgroundImage.propertyView({
               label: `Background Image`,
-              placeholder: 'https://temp.im/350x400',
+              placeholder: "https://temp.im/350x400",
             })}
           </Section>
           <Section name={trans("navLayout.navStyle")}>
-            { children.navStyle.getPropertyView() }
+            {children.navStyle.getPropertyView()}
           </Section>
           <Section name={trans("navLayout.navItemStyle")}>
-            {controlItem({}, (
+            {controlItem(
+              {},
               <Segmented
                 block
                 options={menuItemStyleOptions}
                 value={styleSegment}
                 onChange={(k) => setStyleSegment(k as MenuItemStyleOptionValue)}
               />
-            ))}
-            {styleSegment === 'normal' && (
-              children.navItemStyle.getPropertyView()
             )}
-            {styleSegment === 'hover' && (
-              children.navItemHoverStyle.getPropertyView()
-            )}
-            {styleSegment === 'active' && (
-              children.navItemActiveStyle.getPropertyView()
-            )}
+            {styleSegment === "normal" &&
+              children.navItemStyle.getPropertyView()}
+            {styleSegment === "hover" &&
+              children.navItemHoverStyle.getPropertyView()}
+            {styleSegment === "active" &&
+              children.navItemActiveStyle.getPropertyView()}
           </Section>
         </div>
       );
@@ -299,67 +312,65 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
   const generateItemKeyRecord = useCallback(
     (items: LayoutMenuItemComp[] | MenuItemNode[]) => {
       const result: Record<string, LayoutMenuItemComp | MenuItemNode> = {};
-      if(dataOptionType === DataOption.Manual) {
+      if (dataOptionType === DataOption.Manual) {
         (items as LayoutMenuItemComp[])?.forEach((item) => {
           const subItems = item.children.items.getView();
           if (subItems.length > 0) {
-            Object.assign(result, generateItemKeyRecord(subItems))
+            Object.assign(result, generateItemKeyRecord(subItems));
           }
           result[item.getItemKey()] = item;
         });
       }
-      if(dataOptionType === DataOption.Json) {
+      if (dataOptionType === DataOption.Json) {
         (items as MenuItemNode[])?.forEach((item) => {
           if (item.children?.length) {
-            Object.assign(result, generateItemKeyRecord(item.children))
+            Object.assign(result, generateItemKeyRecord(item.children));
           }
           result[item.key] = item;
-        })
+        });
       }
       return result;
-    }, [dataOptionType]
-  )
+    },
+    [dataOptionType]
+  );
 
   const itemKeyRecord = useMemo(() => {
-    if(dataOptionType === DataOption.Json) {
-      return generateItemKeyRecord(jsonItems)
+    if (dataOptionType === DataOption.Json) {
+      return generateItemKeyRecord(jsonItems);
     }
-    return generateItemKeyRecord(items)
+    return generateItemKeyRecord(items);
   }, [dataOptionType, jsonItems, items, generateItemKeyRecord]);
 
-  const onMenuItemClick = useCallback(({ key }: { key: string }) => {
-    onEvent('click')
-    const itemComp = itemKeyRecord[key]
-  
-    const url = [
-      ALL_APPLICATIONS_URL,
-      pathParam.applicationId,
-      pathParam.viewMode,
-      key,
-    ].join("/");
+  const onMenuItemClick = useCallback(
+    ({ key }: { key: string }) => {
+      onEvent("click");
+      const itemComp = itemKeyRecord[key];
 
-    // handle manual menu item action
-    if(dataOptionType === DataOption.Manual) {
-      (itemComp as LayoutMenuItemComp).children.action.act(url);
-      return;
-    }
-    // handle json menu item action
-    if((itemComp as MenuItemNode).action?.newTab) {
-      return window.open((itemComp as MenuItemNode).action?.url, '_blank')
-    }
-    history.push(url);
-  }, [pathParam.applicationId, pathParam.viewMode, dataOptionType, itemKeyRecord])
+      const url = [
+        ALL_APPLICATIONS_URL,
+        pathParam.applicationId,
+        pathParam.viewMode,
+        key,
+      ].join("/");
+
+      // handle manual menu item action
+      if (dataOptionType === DataOption.Manual) {
+        (itemComp as LayoutMenuItemComp).children.action.act(url);
+        return;
+      }
+      // handle json menu item action
+      if ((itemComp as MenuItemNode).action?.newTab) {
+        return window.open((itemComp as MenuItemNode).action?.url, "_blank");
+      }
+      history.push(url);
+    },
+    [pathParam.applicationId, pathParam.viewMode, dataOptionType, itemKeyRecord]
+  );
 
   const getJsonMenuItem = useCallback(
     (items: MenuItemNode[]): MenuProps["items"] => {
       return items?.map((item: MenuItemNode) => {
-        const {
-          label,
-          key,
-          hidden,
-          icon,
-          children,
-        } = item;
+        const { label, key, hidden, icon, children } = item;
         return {
           label,
           key,
@@ -368,10 +379,11 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
           onTitleClick: onMenuItemClick,
           onClick: onMenuItemClick,
           ...(children?.length && { children: getJsonMenuItem(children) }),
-        }
-      })
-    }, [onMenuItemClick]
-  )
+        };
+      });
+    },
+    [onMenuItemClick]
+  );
 
   const getMenuItem = useCallback(
     (itemComps: LayoutMenuItemComp[]): MenuProps["items"] => {
@@ -393,9 +405,9 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
   );
 
   const menuItems = useMemo(() => {
-    if(dataOptionType === DataOption.Json) return getJsonMenuItem(jsonItems)
+    if (dataOptionType === DataOption.Json) return getJsonMenuItem(jsonItems);
 
-    return getMenuItem(items)
+    return getMenuItem(items);
   }, [dataOptionType, jsonItems, getJsonMenuItem, items, getMenuItem]);
 
   // Find by path itemKey
@@ -410,7 +422,10 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
             return [item.getItemKey(), ...childPath];
           }
         } else {
-          if (item.getItemKey() === itemKey && !item.children.hidden.getView()) {
+          if (
+            item.getItemKey() === itemKey &&
+            !item.children.hidden.getView()
+          ) {
             return [item.getItemKey()];
           }
         }
@@ -482,11 +497,12 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
         }
       }
       return [];
-    }, []
+    },
+    []
   );
 
   const defaultOpenKeys = useMemo(() => {
-    if(dataOptionType === DataOption.Json) {
+    if (dataOptionType === DataOption.Json) {
       let itemPath: string[];
       if (pathParam.appPageId) {
         itemPath = findItemPathByKeyJson(jsonItems, pathParam.appPageId);
@@ -518,9 +534,9 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
 
   const pageView = useMemo(() => {
     let pageView = <EmptyContent text="" style={{ height: "100%" }} />;
-    
-    if(dataOptionType === DataOption.Manual) {
-      const selectedItem = (itemKeyRecord[selectedKey] as LayoutMenuItemComp);
+
+    if (dataOptionType === DataOption.Manual) {
+      const selectedItem = itemKeyRecord[selectedKey] as LayoutMenuItemComp;
       if (selectedItem && !selectedItem.children.hidden.getView()) {
         const compView = selectedItem.children.action.getView();
         if (compView) {
@@ -528,40 +544,43 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
         }
       }
     }
-    if(dataOptionType === DataOption.Json) {
-      const item = (itemKeyRecord[selectedKey] as MenuItemNode)
-      if(item?.action?.url) {
-        pageView =  <iframe
-          title={item?.action?.url}
-          src={item?.action?.url}
-          width="100%"
-          height="100%"
-          style={{ border: "none", marginBottom: "-6px" }}
-        />
+    if (dataOptionType === DataOption.Json) {
+      const item = itemKeyRecord[selectedKey] as MenuItemNode;
+      console.log(item?.action?.url);
+      if (item?.action?.url) {
+        pageView = (
+          <iframe
+            title={item?.action?.url}
+            src={item?.action?.url}
+            width="100%"
+            height="100%"
+            style={{ border: "none", marginBottom: "-6px" }}
+          />
+        );
       }
     }
     return pageView;
-  }, [dataOptionType, itemKeyRecord, selectedKey])
+  }, [dataOptionType, itemKeyRecord, selectedKey]);
 
   const getVerticalMargin = (margin: string[]) => {
-    if(margin.length === 1) return `${margin[0]}`;
-    if(margin.length === 2) return `(${margin[0]} + ${margin[0]})`;
-    if(margin.length === 3 || margin.length === 4)
+    if (margin.length === 1) return `${margin[0]}`;
+    if (margin.length === 2) return `(${margin[0]} + ${margin[0]})`;
+    if (margin.length === 3 || margin.length === 4)
       return `(${margin[0]} + ${margin[2]})`;
 
-    return '0px';
-  }
+    return "0px";
+  };
   const getHorizontalMargin = (margin: string[]) => {
-    if(margin.length === 1) return `(${margin[0]} + ${margin[0]})`;
-    if(margin.length === 2) return `(${margin[1]} + ${margin[1]})`;
-    if(margin.length === 3 || margin.length === 4)
+    if (margin.length === 1) return `(${margin[0]} + ${margin[0]})`;
+    if (margin.length === 2) return `(${margin[1]} + ${margin[1]})`;
+    if (margin.length === 3 || margin.length === 4)
       return `(${margin[1]} + ${margin[3]})`;
 
-    return '0px';
-  }
+    return "0px";
+  };
 
   let backgroundStyle = navStyle.background;
-  if(!_.isEmpty(backgroundImage))  {
+  if (!_.isEmpty(backgroundImage)) {
     backgroundStyle = `center / cover url('${backgroundImage}') no-repeat, ${backgroundStyle}`;
   }
 
@@ -570,10 +589,12 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
       items={menuItems}
       mode={navMode}
       style={{
-        height: `calc(100% - ${getVerticalMargin(navStyle.margin.split(' '))})`,
-        width: `calc(100% - ${getHorizontalMargin(navStyle.margin.split(' '))})`,
-        borderRight: navMode !== 'horizontal' ? `1px solid ${navStyle.border}` : 'none',
-        borderBottom: navMode === 'horizontal' ? `1px solid ${navStyle.border}` : 'none',
+        height: `calc(100% - ${getVerticalMargin(navStyle.margin.split(" "))})`,
+        width: `calc(100% - ${getHorizontalMargin(navStyle.margin.split(" "))})`,
+        borderRight:
+          navMode !== "horizontal" ? `1px solid ${navStyle.border}` : "none",
+        borderBottom:
+          navMode === "horizontal" ? `1px solid ${navStyle.border}` : "none",
         borderRadius: navStyle.radius,
         color: navStyle.text,
         margin: navStyle.margin,
@@ -585,7 +606,10 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
       defaultOpenKeys={defaultOpenKeys}
       selectedKeys={[selectedKey]}
       $navItemStyle={{
-        width: navMode === 'horizontal' ? 'auto' : `calc(100% - ${getHorizontalMargin(navItemStyle.margin.split(' '))})`,
+        width:
+          navMode === "horizontal"
+            ? "auto"
+            : `calc(100% - ${getHorizontalMargin(navItemStyle.margin.split(" "))})`,
         ...navItemStyle,
       }}
       $navItemHoverStyle={navItemHoverStyle}
@@ -595,9 +619,9 @@ NavTmpLayout = withViewFn(NavTmpLayout, (comp) => {
 
   let content = (
     <Layout>
-      {navMode === 'horizontal' ? (
-        <Header style={{ display: 'flex', alignItems: 'center', padding: 0 }}>
-          { navMenu }
+      {navMode === "horizontal" ? (
+        <Header style={{ display: "flex", alignItems: "center", padding: 0 }}>
+          {navMenu}
         </Header>
       ) : (
         <StyledSide theme="light" width={navWidth} collapsed={navCollapse}>

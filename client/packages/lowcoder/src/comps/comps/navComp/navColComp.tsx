@@ -27,7 +27,7 @@ import {
 import { hiddenPropertyView } from "comps/utils/propertyUtils";
 import { trans } from "i18n";
 
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { EditorContext } from "comps/editorState";
 import {
   AppstoreOutlined,
@@ -41,7 +41,7 @@ import {
 import { genRandomKey } from "@lowcoder-ee/index.sdk";
 import Item from "antd/es/list/Item";
 
-type MenuItem = Required<MenuProps>["items"][number];
+type NavColComp = Required<MenuProps>["items"][number];
 const childrenMap = {
   logoUrl: StringControl,
   items: withDefault(navListComp(), [
@@ -52,8 +52,9 @@ const childrenMap = {
   ]),
 };
 
-const NavCompBase = new UICompBuilder(childrenMap, (props) => {
+const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
   const data = props.items;
+  const [selectedKey, setSelectedKey] = useState();
   const items = (
     <>
       {data.map((menuItem, idx) => {
@@ -74,29 +75,40 @@ const NavCompBase = new UICompBuilder(childrenMap, (props) => {
             label: subItem.children.label.getView(),
           });
         });
+        console.log(label);
+        console.log(subMenuItems);
+        const handleClick = (e: any) => {
+          setSelectedKey(e.key);
+        };
         const item = (
-          <Item key={idx} onClick={() => onEvent("click")}>
-            {label}
-            {items.length > 0 && <DownOutlined />}
-          </Item>
+          <Menu
+            mode="inline"
+            onClick={handleClick}
+            selectedKeys={[selectedKey as any]}
+          >
+            {visibleSubItems.length == 0 && (
+              <Menu.Item key={idx} onClick={() => onEvent("click")}>
+                {label}
+              </Menu.Item>
+            )}
+            {visibleSubItems.length > 0 && (
+              <Menu.SubMenu title={label}>
+                {subMenuItems.map((d, i) => (
+                  <Menu.Item
+                    key={i}
+                    onClick={(e) => {
+                      const { onEvent: onSubEvent } =
+                        items[Number(e.key)]?.getView();
+                      onSubEvent("click");
+                    }}
+                  >
+                    {d.label}
+                  </Menu.Item>
+                ))}
+              </Menu.SubMenu>
+            )}
+          </Menu>
         );
-        if (visibleSubItems.length > 0) {
-          const subMenu = (
-            <Menu
-              onClick={(e) => {
-                const { onEvent: onSubEvent } = items[Number(e.key)]?.getView();
-                onSubEvent("click");
-              }}
-              selectedKeys={subMenuSelectedKeys}
-              items={subMenuItems}
-            />
-          );
-          return (
-            <Dropdown key={idx} dropdownRender={() => subMenu}>
-              {item}
-            </Dropdown>
-          );
-        }
         return item;
       })}
     </>
@@ -119,6 +131,6 @@ const NavCompBase = new UICompBuilder(childrenMap, (props) => {
   })
   .build();
 
-export const NavComp = withExposingConfigs(NavCompBase, [
+export const NavColComp = withExposingConfigs(NavColCompBase, [
   new NameConfig("logoUrl", ""),
 ]);
