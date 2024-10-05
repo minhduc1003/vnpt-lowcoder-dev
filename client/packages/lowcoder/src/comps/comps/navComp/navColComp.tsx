@@ -59,27 +59,27 @@ const childrenMap = {
     },
   ]),
   navStyle: styleControl(NavLayoutStyle, "navStyle"),
-    navItemStyle: styleControl(NavLayoutItemStyle, "navItemStyle"),
-    navItemHoverStyle: styleControl(
-      NavLayoutItemHoverStyle,
-      "navItemHoverStyle"
-    ),
-    navItemActiveStyle: styleControl(
-      NavLayoutItemActiveStyle,
-      "navItemActiveStyle"
-    ),
+  navItemStyle: styleControl(NavLayoutItemStyle, "navItemStyle"),
+  navItemHoverStyle: styleControl(NavLayoutItemHoverStyle, "navItemHoverStyle"),
+  navItemActiveStyle: styleControl(
+    NavLayoutItemActiveStyle,
+    "navItemActiveStyle"
+  ),
 };
 const StyledMenu = styled(Menu)<{
   $navItemStyle?: NavLayoutItemStyleType;
   $navItemHoverStyle?: NavLayoutItemHoverStyleType;
   $navItemActiveStyle?: NavLayoutItemActiveStyleType;
 }>`
-@media only screen and (max-width: 768px) {
-  .ant-menu-title-content{
-    display: none;
-  } 
-}
-   .ant-menu-item {
+  @media only screen and (max-width: 768px) {
+    .ant-menu-title-content {
+      display: none;
+    }
+  }
+  .ant-menu-title-content {
+    margin-left: 10px;
+  }
+  .ant-menu-item {
     background-color: ${(props) => props.$navItemStyle?.background};
     color: ${(props) => props.$navItemStyle?.text};
     border-radius: ${(props) => props.$navItemStyle?.radius} !important;
@@ -87,20 +87,18 @@ const StyledMenu = styled(Menu)<{
   }
   .ant-menu-item-active {
     background-color: ${(props) =>
-    props.$navItemHoverStyle?.background} !important;
+      props.$navItemHoverStyle?.background} !important;
     color: ${(props) => props.$navItemHoverStyle?.text} !important;
     border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
-  } 
+  }
   .ant-menu-item-selected {
     background-color: ${(props) =>
-    props.$navItemActiveStyle?.background} !important;
+      props.$navItemActiveStyle?.background} !important;
     color: ${(props) => props.$navItemActiveStyle?.text} !important;
     border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
   }
 
   .ant-menu-submenu {
-    
-
     .ant-menu-submenu-title {
       background-color: ${(props) => props.$navItemStyle?.background};
       color: ${(props) => props.$navItemStyle?.text};
@@ -108,12 +106,10 @@ const StyledMenu = styled(Menu)<{
       border: ${(props) => `1px solid ${props.$navItemStyle?.border}`};
     }
 
-
-
     &.ant-menu-submenu-active {
       > .ant-menu-submenu-title {
         background-color: ${(props) =>
-    props.$navItemHoverStyle?.background} !important;
+          props.$navItemHoverStyle?.background} !important;
         color: ${(props) => props.$navItemHoverStyle?.text} !important;
         border: ${(props) => `1px solid ${props.$navItemHoverStyle?.border}`};
       }
@@ -122,12 +118,12 @@ const StyledMenu = styled(Menu)<{
       > .ant-menu-submenu-title {
         width: 100%;
         background-color: ${(props) =>
-    props.$navItemActiveStyle?.background} !important;
+          props.$navItemActiveStyle?.background} !important;
         color: ${(props) => props.$navItemActiveStyle?.text} !important;
         border: ${(props) => `1px solid ${props.$navItemActiveStyle?.border}`};
       }
     }
-  } 
+  }
 `;
 const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
   const data = props.items;
@@ -136,24 +132,26 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
     <>
       {data.map((menuItem, idx) => {
         const { hidden, label, items, active, onEvent } = menuItem.getView();
+        const icon = menuItem.children.icon.getView();
         if (hidden) {
           return null;
         }
         const visibleSubItems = items.filter(
           (item) => !item.children.hidden.getView()
         );
-        const subMenuItems: Array<{ key: string; label: string }> = [];
+        const subMenuItems: Array<{ key: string; label: string; icon: any }> =
+          [];
         const subMenuSelectedKeys: Array<string> = [];
         visibleSubItems.forEach((subItem, index) => {
           const key = index + "";
           subItem.children.active.getView() && subMenuSelectedKeys.push(key);
+          console.log(icon);
           subMenuItems.push({
             key: key,
+            icon: subItem.children.icon.getView(),
             label: subItem.children.label.getView(),
           });
         });
-        console.log(label);
-        console.log(subMenuItems);
         const handleClick = (e: any) => {
           setSelectedKey(e.key);
         };
@@ -167,7 +165,7 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
             $navItemStyle={props.navItemStyle}
           >
             {visibleSubItems.length == 0 && (
-              <Menu.Item key={idx} onClick={() => onEvent("click")}>
+              <Menu.Item key={idx} onClick={() => onEvent("click")} icon={icon}>
                 {label}
               </Menu.Item>
             )}
@@ -181,6 +179,7 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
                         items[Number(e.key)]?.getView();
                       onSubEvent("click");
                     }}
+                    icon={d.icon}
                   >
                     {d.label}
                   </Menu.Item>
@@ -198,30 +197,29 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
 })
   .setPropertyViewFn((children) => {
     const [styleSegment, setStyleSegment] = useState("normal");
-    
+
     return (
       <>
         <Section name={"Menu"}>{menuPropertyView(children?.items)}</Section>
         <Section name={trans("navLayout.navStyle")}>
-            {children.navStyle.getPropertyView()}
-          </Section>
-          <Section name={trans("navLayout.navItemStyle")}>
-            {controlItem(
-              {},
-              <Segmented
-                block
-                options={menuItemStyleOptions}
-                value={styleSegment}
-                onChange={(k) => setStyleSegment(k as MenuItemStyleOptionValue)}
-              />
-            )}
-            {styleSegment === "normal" &&
-              children.navItemStyle.getPropertyView()}
-            {styleSegment === "hover" &&
-              children.navItemHoverStyle.getPropertyView()}
-            {styleSegment === "active" &&
-              children.navItemActiveStyle.getPropertyView()}
-          </Section>
+          {children.navStyle.getPropertyView()}
+        </Section>
+        <Section name={trans("navLayout.navItemStyle")}>
+          {controlItem(
+            {},
+            <Segmented
+              block
+              options={menuItemStyleOptions}
+              value={styleSegment}
+              onChange={(k) => setStyleSegment(k as MenuItemStyleOptionValue)}
+            />
+          )}
+          {styleSegment === "normal" && children.navItemStyle.getPropertyView()}
+          {styleSegment === "hover" &&
+            children.navItemHoverStyle.getPropertyView()}
+          {styleSegment === "active" &&
+            children.navItemActiveStyle.getPropertyView()}
+        </Section>
       </>
     );
   })

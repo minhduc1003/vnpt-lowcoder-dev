@@ -1,12 +1,25 @@
+import { IconControl } from "@lowcoder-ee/index.sdk";
 import { BoolCodeControl, StringControl } from "comps/controls/codeControl";
-import { clickEvent, eventHandlerControl } from "comps/controls/eventHandlerControl";
+import {
+  clickEvent,
+  eventHandlerControl,
+} from "comps/controls/eventHandlerControl";
 import { list } from "comps/generators/list";
-import { parseChildrenFromValueAndChildrenMap, ToViewReturn } from "comps/generators/multi";
+import {
+  parseChildrenFromValueAndChildrenMap,
+  ToViewReturn,
+} from "comps/generators/multi";
 import { withDefault } from "comps/generators/simpleGenerators";
 import { hiddenPropertyView } from "comps/utils/propertyUtils";
 import { trans } from "i18n";
 import _ from "lodash";
-import { fromRecord, MultiBaseComp, Node, RecordNode, RecordNodeToValue } from "lowcoder-core";
+import {
+  fromRecord,
+  MultiBaseComp,
+  Node,
+  RecordNode,
+  RecordNodeToValue,
+} from "lowcoder-core";
 import { ReactNode } from "react";
 
 const events = [clickEvent];
@@ -15,6 +28,7 @@ const childrenMap = {
   label: StringControl,
   hidden: BoolCodeControl,
   active: BoolCodeControl,
+  icon: IconControl,
   onEvent: withDefault(eventHandlerControl(events), [
     {
       // name: "click",
@@ -30,13 +44,16 @@ type ChildrenType = {
   label: InstanceType<typeof StringControl>;
   hidden: InstanceType<typeof BoolCodeControl>;
   active: InstanceType<typeof BoolCodeControl>;
+  icon: InstanceType<typeof IconControl>;
   onEvent: InstanceType<ReturnType<typeof eventHandlerControl>>;
   items: InstanceType<ReturnType<typeof navListComp>>;
 };
 
 export class NavItemComp extends MultiBaseComp<ChildrenType> {
   override getView() {
-    return _.mapValues(this.children, (c) => c.getView()) as ToViewReturn<ChildrenType>;
+    return _.mapValues(this.children, (c) =>
+      c.getView()
+    ) as ToViewReturn<ChildrenType>;
   }
 
   override getPropertyView(): ReactNode {
@@ -44,7 +61,13 @@ export class NavItemComp extends MultiBaseComp<ChildrenType> {
       <>
         {this.children.label.propertyView({ label: trans("label") })}
         {hiddenPropertyView(this.children)}
-        {this.children.active.propertyView({ label: trans("navItemComp.active") })}
+        {this.children.active.propertyView({
+          label: trans("navItemComp.active"),
+        })}
+        {this.children.icon.propertyView({
+          label: trans("icon"),
+          tooltip: trans("aggregation.iconTooltip"),
+        })}
         {this.children.onEvent.propertyView({ inline: true })}
       </>
     );
