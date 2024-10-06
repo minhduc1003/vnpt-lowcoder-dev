@@ -1,12 +1,29 @@
 import { ViewDocIcon } from "assets/icons";
-import { ArrayControl, BoolCodeControl, NumberControl, RadiusControl, StringControl } from "comps/controls/codeControl";
-import { dropdownControl, LeftRightControl } from "comps/controls/dropdownControl";
+import {
+  ArrayControl,
+  BoolCodeControl,
+  NumberControl,
+  RadiusControl,
+  StringControl,
+} from "comps/controls/codeControl";
+import {
+  dropdownControl,
+  LeftRightControl,
+} from "comps/controls/dropdownControl";
 import { IconControl } from "comps/controls/iconControl";
-import { MultiCompBuilder, valueComp, withContext, withDefault } from "comps/generators";
+import {
+  MultiCompBuilder,
+  valueComp,
+  withContext,
+  withDefault,
+} from "comps/generators";
 import { list } from "comps/generators/list";
 import { ToViewReturn } from "comps/generators/multi";
 import { genRandomKey } from "comps/utils/idGenerator";
-import { disabledPropertyView, hiddenPropertyView } from "comps/utils/propertyUtils";
+import {
+  disabledPropertyView,
+  hiddenPropertyView,
+} from "comps/utils/propertyUtils";
 import { trans } from "i18n";
 import _, { mapValues } from "lodash";
 import {
@@ -53,12 +70,9 @@ const OptionTypes = [
 
 // All options must contain label
 type OptionChildType = { label: InstanceType<typeof StringControl> };
-type OptionsControlType = new (params: CompParams<any>) => MultiBaseComp<
-  OptionChildType,
-  any,
-  any
-> &
-  Comp<any, any, any>;
+type OptionsControlType = new (
+  params: CompParams<any>
+) => MultiBaseComp<OptionChildType, any, any> & Comp<any, any, any>;
 type OptionControlParam = {
   // list title
   title?: string;
@@ -95,7 +109,10 @@ function withDataIndex<T extends OptionsControlType>(VariantComp: T) {
 }
 
 // Deduplication, the same value takes the first one
-function distinctValue<T extends ToViewReturn<OptionChildType>>(data: T[], uniqField: keyof T) {
+function distinctValue<T extends ToViewReturn<OptionChildType>>(
+  data: T[],
+  uniqField: keyof T
+) {
   if (!data || data.length <= 0) {
     return data;
   }
@@ -175,7 +192,9 @@ export function manualOptionsControl<T extends OptionsControlType>(
           itemTitle={(comp) => comp.children.label.getView()}
           popoverTitle={() => trans("edit")}
           content={(comp) => {
-            return hasPropertyView(comp) ? comp.propertyView({}) : comp.getPropertyView();
+            return hasPropertyView(comp)
+              ? comp.propertyView({})
+              : comp.getPropertyView();
           }}
           items={manualComp.getView()}
           onAdd={() => {
@@ -207,7 +226,8 @@ export function manualOptionsControl<T extends OptionsControlType>(
           }}
           dataIndex={(comp) => comp.getDataIndex()}
           uniqVal={
-            config.uniqField && ((comp) => (comp.children as any)[config.uniqField].getView())
+            config.uniqField &&
+            ((comp) => (comp.children as any)[config.uniqField].getView())
           }
           title={title}
         />
@@ -257,7 +277,9 @@ export function mapOptionsControl<T extends OptionsControlType>(
   // @ts-ignore
   class TempComp extends VariantComp {
     override getPropertyView() {
-      return hasPropertyView(this) ? this.propertyView({ autoMap: true }) : super.getPropertyView();
+      return hasPropertyView(this)
+        ? this.propertyView({ autoMap: true })
+        : super.getPropertyView();
     }
   }
 
@@ -315,14 +337,15 @@ export function mapOptionsControl<T extends OptionsControlType>(
     override reduce(action: CompAction) {
       // TODO: temporary solution condition to fix context issue in dropdown option's events
       if (
-        action.type === CompActionTypes.CUSTOM
-        && (action.value as JSONObject).type === 'actionTriggered'
+        action.type === CompActionTypes.CUSTOM &&
+        (action.value as JSONObject).type === "actionTriggered"
       ) {
-        const comp = reduceInContext({ inEventContext: true }, () => super.reduce(action));
+        const comp = reduceInContext({ inEventContext: true }, () =>
+          super.reduce(action)
+        );
         return comp;
-      } else
-      if (action.type === CompActionTypes.UPDATE_NODES_V2) {
-        const comp = super.reduce(action)
+      } else if (action.type === CompActionTypes.UPDATE_NODES_V2) {
+        const comp = super.reduce(action);
         if (comp.children.data !== this.children.data) {
           const sourceArray = comp.children.data.getView();
           const dataExample = sourceArray ? sourceArray[0] : undefined;
@@ -349,7 +372,44 @@ export function mapOptionsControl<T extends OptionsControlType>(
     }
   };
 }
+export function optionsControlOnlyMap<T extends OptionsControlType>(
+  VariantComp: T,
+  config: {
+    // init value
+    initOptions?: ConstructorToDataType<T>[];
+    // Unique value field, used to deduplicate
+    uniqField?: keyof ConstructorToView<T>;
+    // manual mode list title
+    title?: string;
+    autoIncField?: keyof PickNumberFields<ConstructorToView<T>>;
+  }
+) {
+  type OptionViewType = ConstructorToView<T>;
 
+  const TmpOptionControl = new MultiCompBuilder(
+    {
+      mapData: mapOptionsControl(VariantComp, config.uniqField),
+    },
+    (props): OptionViewType[] => {
+      return props.mapData;
+    }
+  )
+    .setPropertyViewFn(() => {
+      throw new Error("Method not implemented.");
+    })
+    .build();
+
+  return class extends TmpOptionControl {
+    exposingNode() {
+      return this.children.mapData.exposingNode();
+    }
+
+    propertyView(param: OptionControlParam) {
+      const item = this.children.mapData.getPropertyView();
+      return controlItem({ searchChild: true }, <>{item}</>);
+    }
+  };
+}
 export function optionsControl<T extends OptionsControlType>(
   VariantComp: T,
   config: {
@@ -423,7 +483,10 @@ let SelectInputOption = new MultiCompBuilder(
   (props) => props
 ).build();
 
-SelectInputOption = class extends SelectInputOption implements OptionCompProperty {
+SelectInputOption = class
+  extends SelectInputOption
+  implements OptionCompProperty
+{
   propertyView(param: { autoMap?: boolean }) {
     return (
       <>
@@ -467,7 +530,9 @@ SelectOption = class extends SelectOption implements OptionCompProperty {
           placeholder: param.autoMap ? "{{item}}" : "",
         })}
         {this.children.value.propertyView({ label: trans("value") })}
-        {this.children.prefixIcon.propertyView({ label: trans("button.prefixIcon") })}
+        {this.children.prefixIcon.propertyView({
+          label: trans("button.prefixIcon"),
+        })}
         {disabledPropertyView(this.children)}
         {hiddenPropertyView(this.children)}
       </>
@@ -495,7 +560,10 @@ const DropdownOption = new MultiCompBuilder(
 )
   .setPropertyViewFn((children) => (
     <>
-      {children.label.propertyView({ label: trans("label"), placeholder: "{{item}}" })}
+      {children.label.propertyView({
+        label: trans("label"),
+        placeholder: "{{item}}",
+      })}
       {children.prefixIcon.propertyView({ label: trans("button.prefixIcon") })}
       {disabledPropertyView(children)}
       {hiddenPropertyView(children)}
@@ -509,6 +577,50 @@ export const DropdownOptionControl = optionsControl(DropdownOption, {
     { label: trans("optionsControl.optionI", { i: 1 }) },
     { label: trans("optionsControl.optionI", { i: 2 }) },
   ],
+});
+const HeaderMenuOption = new MultiCompBuilder(
+  {
+    label: StringControl,
+    icon: StringControl,
+    onEvent: ButtonEventHandlerControl,
+  },
+  (props) => props
+)
+  .setPropertyViewFn((children) => (
+    <>
+      {children.label.propertyView({
+        label: trans("label"),
+        placeholder: "{{item}}",
+      })}
+      {children.icon.propertyView({ label: trans("button.prefixIcon") })}
+      {children.onEvent.getPropertyView()}
+    </>
+  ))
+  .build();
+export const HeaderMenuOptionControl = optionsControl(HeaderMenuOption, {
+  initOptions: [{ label: trans("optionsControl.optionI", { i: 1 }) }],
+});
+const NotifyOption = new MultiCompBuilder(
+  {
+    label: StringControl,
+    icon: StringControl,
+    onEvent: ButtonEventHandlerControl,
+  },
+  (props) => props
+)
+  .setPropertyViewFn((children) => (
+    <>
+      {children.label.propertyView({
+        label: trans("label"),
+        placeholder: "{{item}}",
+      })}
+      {children.icon.propertyView({ label: trans("button.prefixIcon") })}
+      {children.onEvent.getPropertyView()}
+    </>
+  ))
+  .build();
+export const NotifyControl = optionsControlOnlyMap(NotifyOption, {
+  initOptions: [{ label: trans("optionsControl.optionI", { i: 2 }) }],
 });
 
 const TabsOption = new MultiCompBuilder(
@@ -558,17 +670,17 @@ const StyledContent = styled.div`
 
     > div:nth-of-type(1) {
       flex: 0 0 96px;
-  
+
       div {
         line-height: 16px;
       }
     }
-  
+
     > svg {
       height: 30px;
       width: 25px;
     }
-  
+
     > div:nth-of-type(2) {
       flex: 1 1 auto;
     }
@@ -590,41 +702,41 @@ const ColumnOption = new MultiCompBuilder(
   },
   (props) => props
 )
-.setPropertyViewFn((children) => (
-  <StyledContent>
-    {children.minWidth.propertyView({
-      label: trans('responsiveLayout.minWidth'),
-      preInputNode: <StyledIcon as={WidthIcon} title="" />,
-      placeholder: '3px',
-    })}
-    {children.background.propertyView({
-      label: trans('style.background'),
-    })}
-    {children.backgroundImage.propertyView({
-      label: `Background Image`,
-      // preInputNode: <StyledIcon as={ImageCompIcon} title="" />,
-      placeholder: 'https://temp.im/350x400',
-    })}
-    {children.border.propertyView({
-      label: trans('style.border')
-    })}
-    {children.radius.propertyView({
-      label: trans('style.borderRadius'),
-      preInputNode: <StyledIcon as={IconRadius} title="" />,	
-      placeholder: '3px',
-    })}
-    {children.margin.propertyView({
-      label: trans('style.margin'),
-      preInputNode: <StyledIcon as={ExpandIcon} title="" />,	
-      placeholder: '3px',
-    })}
-    {children.padding.propertyView({
-      label: trans('style.padding'),
-      preInputNode: <StyledIcon as={CompressIcon} title="" />,	
-      placeholder: '3px',
-    })}
-  </StyledContent>
-))
+  .setPropertyViewFn((children) => (
+    <StyledContent>
+      {children.minWidth.propertyView({
+        label: trans("responsiveLayout.minWidth"),
+        preInputNode: <StyledIcon as={WidthIcon} title="" />,
+        placeholder: "3px",
+      })}
+      {children.background.propertyView({
+        label: trans("style.background"),
+      })}
+      {children.backgroundImage.propertyView({
+        label: `Background Image`,
+        // preInputNode: <StyledIcon as={ImageCompIcon} title="" />,
+        placeholder: "https://temp.im/350x400",
+      })}
+      {children.border.propertyView({
+        label: trans("style.border"),
+      })}
+      {children.radius.propertyView({
+        label: trans("style.borderRadius"),
+        preInputNode: <StyledIcon as={IconRadius} title="" />,
+        placeholder: "3px",
+      })}
+      {children.margin.propertyView({
+        label: trans("style.margin"),
+        preInputNode: <StyledIcon as={ExpandIcon} title="" />,
+        placeholder: "3px",
+      })}
+      {children.padding.propertyView({
+        label: trans("style.padding"),
+        preInputNode: <StyledIcon as={CompressIcon} title="" />,
+        placeholder: "3px",
+      })}
+    </StyledContent>
+  ))
   .build();
 
 export const ColumnOptionControl = manualOptionsControl(ColumnOption, {
@@ -638,7 +750,7 @@ export const ColumnOptionControl = manualOptionsControl(ColumnOption, {
 
 let StepOption = new MultiCompBuilder(
   {
-    value : NumberControl,
+    value: NumberControl,
     label: StringControl,
     subTitle: StringControl,
     description: StringControl,
@@ -653,12 +765,25 @@ StepOption = class extends StepOption implements OptionCompProperty {
   propertyView(param: { autoMap?: boolean }) {
     return (
       <>
-        {this.children.value.propertyView({ label: trans("stepOptionsControl.value"), tooltip: trans("stepOptionsControl.valueTooltip") })}
-        {this.children.label.propertyView({ label: trans("stepOptionsControl.title") })}
-        {this.children.subTitle.propertyView({ label: trans("stepOptionsControl.subTitle") })}
-        {this.children.description.propertyView({ label: trans("stepOptionsControl.description") })}
-        {this.children.icon.propertyView({ label: trans("stepOptionsControl.icon") })}
-        {this.children.status.propertyView({ label: trans("stepOptionsControl.status") })}
+        {this.children.value.propertyView({
+          label: trans("stepOptionsControl.value"),
+          tooltip: trans("stepOptionsControl.valueTooltip"),
+        })}
+        {this.children.label.propertyView({
+          label: trans("stepOptionsControl.title"),
+        })}
+        {this.children.subTitle.propertyView({
+          label: trans("stepOptionsControl.subTitle"),
+        })}
+        {this.children.description.propertyView({
+          label: trans("stepOptionsControl.description"),
+        })}
+        {this.children.icon.propertyView({
+          label: trans("stepOptionsControl.icon"),
+        })}
+        {this.children.status.propertyView({
+          label: trans("stepOptionsControl.status"),
+        })}
         {disabledPropertyView(this.children)}
       </>
     );
@@ -667,14 +792,44 @@ StepOption = class extends StepOption implements OptionCompProperty {
 
 export const StepOptionControl = optionsControl(StepOption, {
   initOptions: [
-    { value: "1", label: "Step 1", subTitle: "Initialization", description: "Initial setup of parameters.", icon: "/icon:solid/play", status: "finish", disabled: "false" },
-    { value: "2", label: "Step 2", subTitle: "Execution", description: "Execution of the main process.", icon: "/icon:solid/person-running", status: "process", disabled: "false" },
-    { value: "3", label: "Step 3", subTitle: "Finalization", description: "Final steps to complete the process.", icon: "/icon:solid/circle-check", status: "wait", disabled: "true" },
-    { value: "4", label: "Step 4", subTitle: "Completion", description: "Process completed successfully.", status: "wait", disabled: "true" },
+    {
+      value: "1",
+      label: "Step 1",
+      subTitle: "Initialization",
+      description: "Initial setup of parameters.",
+      icon: "/icon:solid/play",
+      status: "finish",
+      disabled: "false",
+    },
+    {
+      value: "2",
+      label: "Step 2",
+      subTitle: "Execution",
+      description: "Execution of the main process.",
+      icon: "/icon:solid/person-running",
+      status: "process",
+      disabled: "false",
+    },
+    {
+      value: "3",
+      label: "Step 3",
+      subTitle: "Finalization",
+      description: "Final steps to complete the process.",
+      icon: "/icon:solid/circle-check",
+      status: "wait",
+      disabled: "true",
+    },
+    {
+      value: "4",
+      label: "Step 4",
+      subTitle: "Completion",
+      description: "Process completed successfully.",
+      status: "wait",
+      disabled: "true",
+    },
   ],
   uniqField: "label",
 });
-
 
 let ColoredTagOption = new MultiCompBuilder(
   {
@@ -685,19 +840,31 @@ let ColoredTagOption = new MultiCompBuilder(
   (props) => props
 ).build();
 
-ColoredTagOption = class extends ColoredTagOption implements OptionCompProperty {
+ColoredTagOption = class
+  extends ColoredTagOption
+  implements OptionCompProperty
+{
   propertyView(param: { autoMap?: boolean }) {
     return (
       <>
-        {this.children.label.propertyView({ label: trans("coloredTagOptionControl.tag") })}
-        {this.children.icon.propertyView({ label: trans("coloredTagOptionControl.icon") })}
-        {this.children.color.propertyView({ label: trans("coloredTagOptionControl.color") })}
+        {this.children.label.propertyView({
+          label: trans("coloredTagOptionControl.tag"),
+        })}
+        {this.children.icon.propertyView({
+          label: trans("coloredTagOptionControl.icon"),
+        })}
+        {this.children.color.propertyView({
+          label: trans("coloredTagOptionControl.color"),
+        })}
       </>
     );
   }
 };
 
 export const ColoredTagOptionControl = optionsControl(ColoredTagOption, {
-  initOptions: [{ label: "Tag1", icon: "/icon:solid/tag", color: "#f50" }, { label: "Tag2", icon: "/icon:solid/tag", color: "#2db7f5" }],
+  initOptions: [
+    { label: "Tag1", icon: "/icon:solid/tag", color: "#f50" },
+    { label: "Tag2", icon: "/icon:solid/tag", color: "#2db7f5" },
+  ],
   uniqField: "label",
 });

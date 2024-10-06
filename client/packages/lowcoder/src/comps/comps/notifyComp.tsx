@@ -10,7 +10,7 @@ import { styleControl } from "comps/controls/styleControl";
 import { trans } from "i18n";
 
 import { useEffect, useRef, useState } from "react";
-import { withIsLoadingMethod } from "@lowcoder-ee/index.sdk";
+import { NotifyControl, withIsLoadingMethod } from "@lowcoder-ee/index.sdk";
 import { relative } from "path";
 const Wrapper = styled.div`
   border-radius: 4px;
@@ -144,6 +144,7 @@ const childrenMap = {
   notiItemStyle: styleControl(StyleControl, "notiItemStyle"),
   notiItemHoverStyle: styleControl(StyleControl, "notiItemHoverStyle"),
   widthDropdown: withDefault(StringControl, "400px"),
+  option: NotifyControl,
 };
 
 const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
@@ -241,6 +242,7 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
           {children.notiItemStyle.getPropertyView()}
           {children.notiItemHoverStyle.getPropertyView()}
         </Section>
+        <Section name={"Option"}>{children.option.propertyView({})}</Section>
       </>
     );
   })

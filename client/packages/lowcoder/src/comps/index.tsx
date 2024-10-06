@@ -655,6 +655,21 @@ export var uiCompMap: Registry = {
       h: 5,
     },
   },
+  headerMenu: {
+    name: "Header menu",
+    enName: "HeaderMenu",
+    description: "HeaderMenu",
+    icon: CustomCompIcon,
+    categories: ["layout"],
+    keywords: "HeaderMenu",
+    lazyLoad: true,
+    compName: "HeaderMenuComp",
+    compPath: "comps/headerMenu",
+    layoutInfo: {
+      w: 5,
+      h: 5,
+    },
+  },
   step: {
     name: trans("uiComp.stepControlCompName"),
     enName: "Steps Control",

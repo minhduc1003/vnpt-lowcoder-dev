@@ -164,7 +164,8 @@ export type UICompType =
   | "ganttChart"
   | "kanban"
   | "notify"
-  | "navigationColumn";
+  | "navigationColumn"
+  | "headerMenu";
 
 export const uiCompRegistry = {} as Record<UICompType | string, UICompManifest>;
 

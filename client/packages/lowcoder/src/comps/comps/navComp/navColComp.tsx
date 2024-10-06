@@ -145,7 +145,6 @@ const NavColCompBase = new UICompBuilder(childrenMap, (props) => {
         visibleSubItems.forEach((subItem, index) => {
           const key = index + "";
           subItem.children.active.getView() && subMenuSelectedKeys.push(key);
-          console.log(icon);
           subMenuItems.push({
             key: key,
             icon: subItem.children.icon.getView(),
