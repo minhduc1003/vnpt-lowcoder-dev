@@ -1740,6 +1740,21 @@ export var uiCompMap: Registry = {
       h: 40,
     },
   },
+  lang: {
+    name: "lang",
+    enName: "lang",
+    description: "lang",
+    icon: CustomCompIcon,
+    categories: ["integration"],
+    keywords: "lang",
+    lazyLoad: true,
+    compName: "LangComp",
+    compPath: "comps/langComp",
+    layoutInfo: {
+      w: 10,
+      h: 10,
+    },
+  },
   module: {
     name: trans("uiComp.moduleCompName"),
     enName: "Module",

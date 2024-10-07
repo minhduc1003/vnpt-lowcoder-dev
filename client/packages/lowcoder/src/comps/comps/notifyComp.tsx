@@ -143,7 +143,6 @@ const childrenMap = {
   countStyle: styleControl(StyleControl, "countStyle"),
   notiItemStyle: styleControl(StyleControl, "notiItemStyle"),
   notiItemHoverStyle: styleControl(StyleControl, "notiItemHoverStyle"),
-  widthDropdown: withDefault(StringControl, "400px"),
   option: NotifyControl,
 };
 
@@ -192,11 +191,14 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
         $isOpen={active}
         $hoverStyle={props.notiItemHoverStyle}
         $itemStyle={props.notiItemStyle}
-        $width={props.widthDropdown}
       >
         <div className="dropdown-head">Notification</div>
-        {props.data.map((d: any, i) => (
-          <div className="dropdown-content-item">
+        {props.option.map((d: any, i) => (
+          <div
+            className="dropdown-content-item"
+            onClick={() => d.onEvent("click")}
+            key={i}
+          >
             <div className="dropdown-content__icon">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -226,23 +228,14 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
   .setPropertyViewFn((children) => {
     return (
       <>
-        <Section name={"Data"}>
-          {children.data.propertyView({
-            label: "Data",
-            tooltip: "Data",
-          })}
-        </Section>
+        <Section name={"Data"}>{children.option.propertyView({})}</Section>
         <Section name={"Count Style"}>
           {children.countStyle.getPropertyView()}
         </Section>
         <Section name={"Dropdown"}>
-          {children.widthDropdown.propertyView({
-            label: "Dropdown width",
-          })}
           {children.notiItemStyle.getPropertyView()}
           {children.notiItemHoverStyle.getPropertyView()}
         </Section>
-        <Section name={"Option"}>{children.option.propertyView({})}</Section>
       </>
     );
   })

@@ -165,7 +165,8 @@ export type UICompType =
   | "kanban"
   | "notify"
   | "navigationColumn"
-  | "headerMenu";
+  | "headerMenu"
+  | "lang";
 
 export const uiCompRegistry = {} as Record<UICompType | string, UICompManifest>;
 

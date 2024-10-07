@@ -215,6 +215,6 @@ export const CompStateIcon: {
   transfer: <TransferCompIconSmall />,
   card: <CardCompIconSmall />,
   timer: <TimeRangeCompIconSmall />,
-
+  lang: <CustomCompIconSmall />,
   shape: <ShapesCompIconSmall />,
 };

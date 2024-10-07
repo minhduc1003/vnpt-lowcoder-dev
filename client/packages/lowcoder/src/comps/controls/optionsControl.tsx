@@ -372,6 +372,48 @@ export function mapOptionsControl<T extends OptionsControlType>(
     }
   };
 }
+export function optionsOnlyManual<T extends OptionsControlType>(
+  VariantComp: T,
+  config: {
+    // init value
+    initOptions?: ConstructorToDataType<T>[];
+    // Unique value field, used to deduplicate
+    uniqField?: keyof ConstructorToView<T>;
+    // manual mode list title
+    title?: string;
+    autoIncField?: keyof PickNumberFields<ConstructorToView<T>>;
+  }
+) {
+  type OptionViewType = ConstructorToView<T>;
+
+  const TmpOptionControl = new MultiCompBuilder(
+    {
+      manual: manualOptionsControl(VariantComp, {
+        initOptions: config.initOptions,
+        uniqField: config.uniqField,
+        autoIncField: config.autoIncField,
+      }),
+    },
+    (props): OptionViewType[] => {
+      return props.manual;
+    }
+  )
+    .setPropertyViewFn(() => {
+      throw new Error("Method not implemented.");
+    })
+    .build();
+
+  return class extends TmpOptionControl {
+    exposingNode() {
+      return this.children.manual.exposingNode();
+    }
+
+    propertyView(param: OptionControlParam) {
+      const item = this.children.manual.propertyView(param);
+      return controlItem({ searchChild: true }, <>{item}</>);
+    }
+  };
+}
 export function optionsControlOnlyMap<T extends OptionsControlType>(
   VariantComp: T,
   config: {
@@ -592,17 +634,18 @@ const HeaderMenuOption = new MultiCompBuilder(
         label: trans("label"),
         placeholder: "{{item}}",
       })}
-      {children.icon.propertyView({ label: trans("button.prefixIcon") })}
+      {children.icon.propertyView({ label: trans("icon") })}
       {children.onEvent.getPropertyView()}
     </>
   ))
   .build();
-export const HeaderMenuOptionControl = optionsControl(HeaderMenuOption, {
+export const HeaderMenuOptionControl = optionsOnlyManual(HeaderMenuOption, {
   initOptions: [{ label: trans("optionsControl.optionI", { i: 1 }) }],
 });
 const NotifyOption = new MultiCompBuilder(
   {
-    label: StringControl,
+    title: StringControl,
+    content: StringControl,
     icon: StringControl,
     onEvent: ButtonEventHandlerControl,
   },
@@ -610,8 +653,12 @@ const NotifyOption = new MultiCompBuilder(
 )
   .setPropertyViewFn((children) => (
     <>
-      {children.label.propertyView({
-        label: trans("label"),
+      {children.title.propertyView({
+        label: trans("title"),
+        placeholder: "{{item}}",
+      })}
+      {children.content.propertyView({
+        label: trans("content"),
         placeholder: "{{item}}",
       })}
       {children.icon.propertyView({ label: trans("button.prefixIcon") })}
@@ -619,7 +666,7 @@ const NotifyOption = new MultiCompBuilder(
     </>
   ))
   .build();
-export const NotifyControl = optionsControlOnlyMap(NotifyOption, {
+export const NotifyControl = optionsControlOnlyMap(NotifyOption as any, {
   initOptions: [{ label: trans("optionsControl.optionI", { i: 2 }) }],
 });
 
