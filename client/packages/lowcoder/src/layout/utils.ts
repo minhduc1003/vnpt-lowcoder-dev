@@ -122,7 +122,9 @@ export function withLayoutItem(
   if (!layout.hasOwnProperty(itemKey)) {
     return [layout, undefined];
   }
-  layout = _.mapValues(layout, (item) => (item.i === itemKey ? cb(cloneLayoutItem(item)) : item));
+  layout = _.mapValues(layout, (item) =>
+    item.i === itemKey ? cb(cloneLayoutItem(item)) : item
+  );
   return [layout, layout[itemKey]];
 }
 
@@ -201,18 +203,18 @@ export function getStatics(layout: Layout): Layout {
 }
 
 export function setTransform(
-  {top, left, width, height }: Position,
-  name ?: string,
+  { top, left, width, height }: Position,
+  name?: string,
   autoHeight?: boolean,
   hidden?: boolean,
-  isDragging?: boolean,
+  isDragging?: boolean
 ): Record<string, any> {
   // Replace unitless items with px
   const translate = `translate(${left}px,${top}px)`;
-  function containsChart(str:string) {
+  function containsChart(str: string) {
     return /chart/i.test(str);
   }
-  let updatedHeight = 'auto';
+  let updatedHeight = "auto";
   if (isDragging || !autoHeight || hidden || (name && containsChart(name))) {
     updatedHeight = `${height}px`;
   }
@@ -223,9 +225,9 @@ export function setTransform(
     MozTransform: translate,
     msTransform: translate,
     OTransform: translate,
-    width: `${width}px`,
+    width: `${width > 50 && width}px`,
     height: updatedHeight,
-    position: 'absolute',
+    position: "absolute",
   };
 }
 
@@ -309,9 +311,15 @@ export function cascade(layout: Layout, priorLayout: Layout = {}): Layout {
   }
 
   // sort items by y
-  const sortedItems: LayoutItem[] = _.sortBy(Object.values(layout), (item) => item.y);
+  const sortedItems: LayoutItem[] = _.sortBy(
+    Object.values(layout),
+    (item) => item.y
+  );
   // sort static items also by y, and dynamically maintain the order
-  let sortedCollisionAreas: LayoutItem[] = _.sortBy(Object.values(staticLayout), (item) => item.y);
+  let sortedCollisionAreas: LayoutItem[] = _.sortBy(
+    Object.values(staticLayout),
+    (item) => item.y
+  );
 
   const newLayout: Layout = {};
   for (const item of sortedItems) {
@@ -323,7 +331,10 @@ export function cascade(layout: Layout, priorLayout: Layout = {}): Layout {
     } else {
       sortedCollisionAreas = shrinkLayoutByMinY(sortedCollisionAreas, item.y);
       let collisionArea: LayoutItem;
-      [newItem, collisionArea] = moveToSolveCollisions(item, sortedCollisionAreas);
+      [newItem, collisionArea] = moveToSolveCollisions(
+        item,
+        sortedCollisionAreas
+      );
       insertWithOrders(sortedCollisionAreas, collisionArea);
     }
     newLayout[newItem.i] = newItem;
@@ -369,7 +380,10 @@ function moveToSolveCollisions(
 }
 
 // move itemToMove to solve the collision
-function deltaYToSolveCollision(itemToMove: LayoutItem, staticItem: LayoutItem): number {
+function deltaYToSolveCollision(
+  itemToMove: LayoutItem,
+  staticItem: LayoutItem
+): number {
   if (!collides(itemToMove, staticItem)) {
     return 0;
   }
@@ -444,11 +458,21 @@ export function isItemResizable(item: LayoutItem) {
   return _.isNil(item.isResizable) || item.isResizable;
 }
 
-function getResizeHandles(isSelected?: boolean, autoHeight?: boolean): Array<ResizeHandleAxis> {
-  return isSelected ? (autoHeight ? ["e", "w"] : ["s", "n", "w", "e", "sw", "nw", "se", "ne"]) : [];
+function getResizeHandles(
+  isSelected?: boolean,
+  autoHeight?: boolean
+): Array<ResizeHandleAxis> {
+  return isSelected
+    ? autoHeight
+      ? ["e", "w"]
+      : ["s", "n", "w", "e", "sw", "nw", "se", "ne"]
+    : [];
 }
 
-export function getItemResizeHandles(item: LayoutItem, extraItem?: ExtraItem): ResizeHandleAxis[] {
+export function getItemResizeHandles(
+  item: LayoutItem,
+  extraItem?: ExtraItem
+): ResizeHandleAxis[] {
   return item.resizeHandles && _.size(item.resizeHandles) !== 0
     ? item.resizeHandles
     : getResizeHandles(extraItem?.isSelected, extraItem?.autoHeight);
@@ -544,7 +568,10 @@ export function moveToZero(layout: Layout): Layout {
 }
 
 // calculate the top-left coordinate of the paste item
-export function calcPasteBaseXY(layout: Layout, keys?: string[]): { x: number; y: number } {
+export function calcPasteBaseXY(
+  layout: Layout,
+  keys?: string[]
+): { x: number; y: number } {
   const filterLayout = _.pick(layout, keys ?? []);
   if (_.size(filterLayout) === 0) {
     return { x: 0, y: bottom(layout) };
@@ -559,7 +586,9 @@ export function calcPasteBaseXY(layout: Layout, keys?: string[]): { x: number; y
  *
  * brute-force implementation by O(n^2)
  */
-export function calcLeftAdjacentItems(layout: Layout): Record<string, string[]> {
+export function calcLeftAdjacentItems(
+  layout: Layout
+): Record<string, string[]> {
   return _.mapValues(layout, (item) => {
     return Object.values(layout)
       .filter((leftItem) => {
@@ -578,7 +607,10 @@ export function calcLeftAdjacentItems(layout: Layout): Record<string, string[]> 
  * keep the items inside the layout by shift
  * if not possible, truncate the right side
  */
-export function shiftInside(positionParams: PositionParams, items: LayoutItem[]): LayoutItem[] {
+export function shiftInside(
+  positionParams: PositionParams,
+  items: LayoutItem[]
+): LayoutItem[] {
   const minX = Math.min(...items.map((item) => item.x));
   const minY = Math.min(...items.map((item) => item.y));
   const maxX = Math.max(...items.map((item) => item.x + item.w));
@@ -630,7 +662,11 @@ export function shiftInside(positionParams: PositionParams, items: LayoutItem[])
  * @param start minimun coordinate along the x-axis, Left closed right away
  * @param end maximun coordinate along the x-axis, Left closed right away
  */
-export function narrow(item: LayoutItem, start: number = 0, end: number): LayoutItem {
+export function narrow(
+  item: LayoutItem,
+  start: number = 0,
+  end: number
+): LayoutItem {
   let { x, w } = item;
   if (x < start) {
     w = Math.max(1, x + w - start);
@@ -693,7 +729,10 @@ export function narrowItems(items: LayoutItem[], cols: number): LayoutItem[] {
   return newItems;
 }
 
-export function isValidLayoutItem(item: LayoutItem, positionParams: PositionParams): boolean {
+export function isValidLayoutItem(
+  item: LayoutItem,
+  positionParams: PositionParams
+): boolean {
   return (
     item.x >= 0 &&
     item.y >= 0 &&

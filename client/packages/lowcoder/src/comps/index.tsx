@@ -1736,8 +1736,8 @@ export var uiCompMap: Registry = {
     compName: "NotifyComp",
     compPath: "comps/notifyComp",
     layoutInfo: {
-      w: 12,
-      h: 40,
+      w: 10,
+      h: 10,
     },
   },
   lang: {

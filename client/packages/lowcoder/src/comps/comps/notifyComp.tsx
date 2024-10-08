@@ -12,18 +12,27 @@ import { trans } from "i18n";
 import { useEffect, useRef, useState } from "react";
 import { NotifyControl, withIsLoadingMethod } from "@lowcoder-ee/index.sdk";
 import { relative } from "path";
-const Wrapper = styled.div`
-  border-radius: 4px;
-  @media only screen and (max-width: 360px) {
+import { size } from "lodash";
+const Wrapper = styled.div<{
+  $size: string;
+}>`
+  @media (max-width: 360px) {
     width: 15px;
     height: 15px;
   }
-  @media only screen and (min-width: 360px) and (max-width: 768px) {
+  /* @media (min-width: 360px) and (max-width: 768px) {
     width: 20px;
     height: 20px;
+  } */
+  width: ${(props) => props.$size};
+  height: ${(props) => props.$size};
+`;
+const IconWrapper = styled.div`
+  position: relative;
+  .icon-notify {
+    width: 100%;
+    height: 100%;
   }
-  width: 30px;
-  height: 30px;
 `;
 const Count = styled.div<{
   $countStyle?: any;
@@ -40,6 +49,12 @@ const Count = styled.div<{
   display: flex;
   justify-content: center;
   align-items: center;
+  @media (max-width: 360px) {
+    font-size: 10px;
+  }
+  @media (min-width: 360px) and (max-width: 768px) {
+    font-size: 11px;
+  }
 `;
 const Dropdown = styled.div<{
   $isOpen?: boolean;
@@ -47,57 +62,69 @@ const Dropdown = styled.div<{
   $itemStyle?: any;
   $width?: string;
 }>`
-  @media only screen and (max-width: 360px) {
-    width: 100px;
+  @media (max-width: 360px) {
     .dropdown-head {
       padding: 2.5px 5px !important;
-      font-size: 14px !important;
+      font-size: 11px !important;
     }
     .dropdown-content-item {
       padding: 2.5px 5px !important;
     }
     .dropdown-content-item > .dropdown-content__icon {
-      display: none;
+      display: none !important;
+    }
+    .dropdown-content-item > .dropdown-content__content > p {
+      font-size: 8px;
+    }
+    .dropdown-content-item > .dropdown-content__content > h2 {
+      font-size: 11px;
+    }
+  }
+  @media (min-width: 360px) and (max-width: 768px) {
+    .dropdown-head {
+      padding: 5px !important;
+      font-size: 14px !important;
+    }
+    .dropdown-content-item {
+      padding: 5px !important;
+    }
+    .dropdown-content-item > .dropdown-content__icon {
+      display: none !important;
     }
     .dropdown-content-item > .dropdown-content__content > p {
       font-size: 10px;
     }
+    .dropdown-content-item > .dropdown-content__content > h2 {
+      font-size: 14px;
+    }
   }
-  @media only screen and (min-width: 360px) and (max-width: 768px) {
-    width: 220px;
+  @media (min-width: 768px) and (max-width: 1024px) {
     .dropdown-head {
-      padding: 5px 10px !important;
       font-size: 16px !important;
     }
-    .dropdown-content-item {
-      padding: 5px 10px !important;
-    }
-    .dropdown-content-item > .dropdown-content__icon {
-      display: none;
-    }
     .dropdown-content-item > .dropdown-content__content > p {
-      font-size: 11px;
+      font-size: 12px;
     }
-  }
-  @media only screen and (min-width: 768px) and (max-width: 1024px) {
-    width: 300px;
+    .dropdown-content-item > .dropdown-content__content > h2 {
+      font-size: 16px;
+    }
   }
   display: ${(props) => (props.$isOpen ? "block" : "none")};
   position: absolute;
-  width: 350px;
+  width: ${(props) => props.$width};
   right: 0;
   background-color: ${(props) => props.$itemStyle.backgroundColor || "#fff"};
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 10px;
   z-index: 1000;
   .dropdown-head {
-    padding: 10px 20px;
+    padding: 10px;
     font-size: 20px;
     font-weight: bold;
     border-bottom: 1px solid lightgray;
   }
   .dropdown-content-item {
-    padding: 10px 20px;
+    padding: 10px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -118,6 +145,7 @@ const Dropdown = styled.div<{
     justify-content: center;
     align-items: center;
   }
+
   .dropdown-content-item > .dropdown-content__icon > svg {
     width: 70%;
     height: 70%;
@@ -139,7 +167,7 @@ const StyleControl = [
   },
 ] as const;
 const childrenMap = {
-  data: withIsLoadingMethod(JSONObjectArrayControl),
+  size: withDefault(StringControl, "30px"),
   countStyle: styleControl(StyleControl, "countStyle"),
   notiItemStyle: styleControl(StyleControl, "notiItemStyle"),
   notiItemHoverStyle: styleControl(StyleControl, "notiItemHoverStyle"),
@@ -147,8 +175,8 @@ const childrenMap = {
 };
 
 const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
-  //   const data = props.items;
   const [active, setActive] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   function useOutsideAlerter(ref: any) {
     useEffect(() => {
       function handleClickOutside(event: any) {
@@ -162,11 +190,26 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
       };
     }, [ref]);
   }
+
+  const updateScreenWidth = () => {
+    setScreenWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenWidth);
+    return () => {
+      window.removeEventListener("resize", updateScreenWidth);
+    };
+  }, []);
   const wrapperRef = useRef(null);
   useOutsideAlerter(wrapperRef);
   return (
-    <Wrapper onClick={() => setActive(!active)} ref={wrapperRef}>
-      <div style={{ position: "relative" }}>
+    <Wrapper
+      onClick={() => setActive(!active)}
+      ref={wrapperRef}
+      $size={props.size}
+    >
+      <IconWrapper>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -181,16 +224,17 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
           />
         </svg>
-        {props.data.length > 0 && (
+        {props.option.length > 0 && (
           <Count $countStyle={props.countStyle}>
-            <span>{props.data.length}</span>
+            <span>{props.option.length}</span>
           </Count>
         )}
-      </div>
+      </IconWrapper>
       <Dropdown
         $isOpen={active}
         $hoverStyle={props.notiItemHoverStyle}
         $itemStyle={props.notiItemStyle}
+        $width={screenWidth < 1024 ? `${screenWidth / 3.5}px` : "350px"}
       >
         <div className="dropdown-head">Notification</div>
         {props.option.map((d: any, i) => (
@@ -229,6 +273,12 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
     return (
       <>
         <Section name={"Data"}>{children.option.propertyView({})}</Section>
+        <Section name={"size"}>
+          {children.size.propertyView({
+            label: "Size",
+            placeholder: "Insert size",
+          })}
+        </Section>
         <Section name={"Count Style"}>
           {children.countStyle.getPropertyView()}
         </Section>
@@ -242,5 +292,5 @@ const NotifyCompBase = new UICompBuilder(childrenMap, (props) => {
   .build();
 
 export const NotifyComp = withExposingConfigs(NotifyCompBase, [
-  new NameConfig("data", ""),
+  new NameConfig("option", ""),
 ]);

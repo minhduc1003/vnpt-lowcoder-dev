@@ -18,9 +18,12 @@ import { useState } from "react";
 import { languageList } from "@lowcoder-ee/i18n";
 import { useDispatch } from "react-redux";
 import { updateUserAction } from "@lowcoder-ee/redux/reduxActions/userActions";
-
+const DropdownStyled = styled(Dropdown)`
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
 const childrenMap = {
-  url: withDefault(StringControl, ""),
+  size: withDefault(StringControl, "20px"),
 };
 
 const LangCompBase = new UICompBuilder(childrenMap, (props) => {
@@ -62,27 +65,27 @@ const LangCompBase = new UICompBuilder(childrenMap, (props) => {
 
   return (
     <>
-      <Dropdown overlay={menu}>
+      <DropdownStyled overlay={menu}>
         <Space>
           {selectedLanguage && (
             <selectedLanguage.flag
-              width={"30px"}
-              height={"30px"}
+              width={props.size}
+              height={props.size}
               style={{ borderRadius: "10px" }}
             />
           )}
-          <DownOutlined />
+          <DownOutlined style={{ width: "10px", height: "10px" }} />
         </Space>
-      </Dropdown>
+      </DropdownStyled>
     </>
   );
 })
   .setPropertyViewFn((children) => {
     return (
       <>
-        <Section name="url">
-          {children.url.propertyView({
-            label: "URL",
+        <Section name="size">
+          {children.size.propertyView({
+            label: "size",
           })}
         </Section>
       </>
