@@ -351,6 +351,21 @@ export var uiCompMap: Registry = {
     defaultDataFnName: "defaultTableData",
     defaultDataFnPath: "comps/tableComp/mockTableComp",
   },
+  tableNew: {
+    name: "TableNew",
+    enName: "TableNew",
+    description: "TableNew",
+    icon: TableCompIcon,
+    categories: ["dashboards"],
+    keywords: "TableNew",
+    lazyLoad: true,
+    compName: "TableNewComp",
+    compPath: "comps/tableNewComp/tableNewComp",
+    layoutInfo: {
+      w: 12,
+      h: 40,
+    },
+  },
 
   pivotTable: {
     name: trans("uiComp.pivotTableCompName"),

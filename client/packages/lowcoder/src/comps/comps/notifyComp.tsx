@@ -20,10 +20,6 @@ const Wrapper = styled.div<{
     width: 15px;
     height: 15px;
   }
-  /* @media (min-width: 360px) and (max-width: 768px) {
-    width: 20px;
-    height: 20px;
-  } */
   width: ${(props) => props.$size};
   height: ${(props) => props.$size};
 `;

@@ -166,7 +166,8 @@ export type UICompType =
   | "notify"
   | "navigationColumn"
   | "headerMenu"
-  | "lang";
+  | "lang"
+  | "tableNew";
 
 export const uiCompRegistry = {} as Record<UICompType | string, UICompManifest>;
 

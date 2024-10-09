@@ -207,7 +207,7 @@ export const CompStateIcon: {
   sunburstChart: <SunburstChartCompIconSmall />,
   themeriverChart: <ThemeriverChartCompIconSmall />,
   basicChart: <ChartCompIconSmall />,
-
+  tableNew: <TableCompIconSmall />,
   avatar: <AvatarCompIconSmall />,
   avatarGroup: <AvatarGroupCompIconSmall />,
   colorPicker: <ColorPickerCompIconSmall />,
